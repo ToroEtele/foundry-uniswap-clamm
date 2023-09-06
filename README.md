@@ -1,66 +1,34 @@
-## Foundry
+# Uniswap CLAMM
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+## Description:
 
-Foundry consists of:
+## Notes:
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+### Uniswap V3 price and tick:
 
-## Documentation
+X = amount of token0 1 ETH
+Y = amount of token1 2000 USDC
 
-https://book.getfoundry.sh/
+V2: P = Price of X in terms of P = Y/X = 2000/1 USDC/ETH
+V3: P = 1.0001^tick^ 
 
-## Usage
+In Uniswap V3 in order to calculate the price we need to know three things:
+1. Liquidity
+2. Price range
+3. Current price
 
-### Build
+ex. ETH/USDC tick = -200697
+P = 1.0001^(-200697)^
 
-```shell
-$ forge build
-```
+To get the price in Y token decimals => P * decimals_0 / decimals_1
 
-### Test
+### Tick spacing:
 
-```shell
-$ forge test
-```
+Number of ticks to skip to skip when the price moves.
 
-### Format
+ex. tick spacing = 2
 
-```shell
-$ forge fmt
-```
+current tick = 0
 
-### Gas Snapshots
-
-```shell
-$ forge snapshot
-```
-
-### Anvil
-
-```shell
-$ anvil
-```
-
-### Deploy
-
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
-
-### Cast
-
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
+Price increases => tick = 2
+Price increases => tick = 4

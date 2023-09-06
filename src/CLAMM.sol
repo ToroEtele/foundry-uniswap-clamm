@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.19;
+pragma solidity 0.8.19;
 
 import {Tick} from "./lib/Tick.sol";
 
@@ -9,6 +9,7 @@ contract CLAMM {
     address public immutable token1;
     // @dev Fee represents some kind of percentage on swaps
     uint24 public immutable fee;
+
     int public immutable tickSpacing;
     uint128 public immutable maxLiquidityPerTick;
 
