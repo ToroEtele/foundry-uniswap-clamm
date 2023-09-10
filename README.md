@@ -32,3 +32,26 @@ current tick = 0
 
 Price increases => tick = 2
 Price increases => tick = 4
+
+### Uniswap V3 sqrtPriceX96:
+
+P = 2000 USDT / 1 ETH
+
+sqrtPriceX96 = sqrt(P) * Q96
+Q96 = 2^(96)^
+
+(sqrtPriceX96 / Q96)^(2)^ = P 
+
+Example in sqrt_price.ipynb
+
+### Uniswap V3 sqrtPriceX96 to tick:
+
+P = (sqrtPriceX96 / Q96)^(2)^ = 1.0001^tick^
+
+log((sqrtPriceX96 / Q96)^(2)^) = log(1.0001^tick^)
+
+2log(sqrtPriceX96 / Q96) = tick * log(1.0001)
+
+=> tick = 2log(sqrtPriceX96 / Q96) / log(1.0001)
+
+Example in sqrt_price_to_tick.ipynb
