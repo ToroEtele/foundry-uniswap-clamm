@@ -8,8 +8,16 @@ import {Position} from "./lib/Position.sol";
 import {TickMath} from "./lib/TickMath.sol";
 import {Tick} from "./lib/Tick.sol";
 
+function checkTicks(int24 tickLower, int24 tickUpper) pure {
+    require(tickLower < tickUpper);
+    require(TickMath.MIN_TICK <= tickLower);
+    require(tickUpper <= TickMath.MAX_TICK);
+}
+
 contract CLAMM {
     using SafeCast for uint256;
+    using Position for mapping(bytes32 => Position.Info);
+    using Position for Position.Info;
 
     address public immutable token0;
     address public immutable token1;
@@ -69,15 +77,54 @@ contract CLAMM {
         int128 liquidityDelta;
     }
 
+    function _updatePosition(
+        address owner,
+        int24 tickLower,
+        int24 tickUpper,
+        int128 liquidityDelta,
+        int24 tick
+    ) private returns (Position.Info storage position) {
+        position = positions.get(owner, tickLower, tickUpper);
+
+        // TODO: Calculate fees
+        uint256 _feeGrowthGlobal0X128 = 0;
+        uint256 _feeGrowthGlobal1X128 = 0;
+
+        // TODO: Calculate fees
+        position.update(liquidityDelta, 0, 0);
+    }
+
     function _modifyPosition(
         ModifyPositionParams memory params
     )
         private
         returns (Position.Info storage position, int256 amount0, int256 amount1)
     {
+        checkTicks(params.tickLower, params.tickUpper);
+
+        Slot0 memory _slot0 = slot0;
+
+        position = _updatePosition(
+            params.owner,
+            params.tickLower,
+            params.tickUpper,
+            params.liquidityDelta,
+            _slot0.tick
+        );
+
         return (positions[bytes32(0)], 0, 0);
     }
 
+    /**
+     *
+     * @param recipient The address of the liquidity provider who will receive the minted liquidity tokens.
+     * @param tickLower The lower price tick of the tick range to which liquidity is added.
+     * @param tickUpper The upper price tick of the tick range to which liquidity is added.
+     * @param amount Amount of liquidity to add to the pool
+     * @return amount0
+     * @return amount1
+     * @dev When you add liquidity to the pool, this function gets called
+     */
     function mint(
         address recipient,
         int24 tickLower,
@@ -92,7 +139,7 @@ contract CLAMM {
                 tickLower: tickLower,
                 tickUpper: tickUpper,
                 // 0 < amount <= max int128 = 2**127 - 1
-                liquidityDelta: int256(uint256(amount)).toInt128()
+                liquidityDelta: int128(int256(uint256(amount)))
             })
         );
 
